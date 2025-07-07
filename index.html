@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verdad o Reto</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-image: linear-gradient(to top right, #1a0b2e, #111827, #0d0d1a);
+            color: #F3F4F6;
+            overflow: hidden;
+        }
+
+        .font-title {
+            font-family: 'Bebas Neue', cursive;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .neon-text-alt {
+            text-shadow: 0 0 5px #f472b6, 0 0 15px #f472b6, 0 0 30px #f472b6, 0 0 50px #c026d3;
+        }
+        
+        .btn-primary {
+            background-image: linear-gradient(to right, #ec4899, #d946ef, #a855f7);
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(236, 72, 153, 0.4);
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 25px rgba(236, 72, 153, 0.7);
+        }
+        
+        .btn-secondary {
+             background-image: linear-gradient(to right, #3b82f6, #6366f1);
+             transition: all 0.3s ease;
+             box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+        }
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.7);
+        }
+
+        .btn-tertiary {
+             background-image: linear-gradient(to right, #ef4444, #f97316);
+             transition: all 0.3s ease;
+             box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+        }
+        .btn-tertiary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.7);
+        }
+        
+        .input-field {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #f472b6;
+            box-shadow: 0 0 10px #f472b6;
+        }
+
+        .modal-enter {
+            animation: modal-in 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        .modal-exit {
+            animation: modal-out 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
+        }
+
+        @keyframes modal-in {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes modal-out {
+            from { opacity: 1; transform: scale(1) translateY(0); }
+            to { opacity: 0; transform: scale(0.9) translateY(20px); }
+        }
+        
+        .player-name-pulse {
+            animation: pulse-glow 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { text-shadow: 0 0 5px #f472b6, 0 0 15px #f472b6, 0 0 30px #f472b6; }
+            50% { text-shadow: 0 0 10px #f871b5, 0 0 25px #f871b5, 0 0 50px #d946ef; }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div id="app-container" class="w-full max-w-md mx-auto">
+
+        <!-- Pantalla de Configuración -->
+        <div id="setup-screen" class="glass-card p-6 md:p-8 rounded-2xl space-y-6">
+            <h1 class="font-title text-5xl font-bold text-center text-pink-400 neon-text-alt tracking-wider">Verdad o Reto</h1>
+            
+            <!-- Agregar Jugadores -->
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Añadir Jugadores</label>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <input type="text" id="player-input" placeholder="Nombre" class="sm:col-span-2 w-full rounded-lg px-4 py-2 text-white input-field">
+                    <select id="gender-select" class="w-full rounded-lg px-4 py-2 text-white input-field">
+                        <option value="hombre">Hombre</option>
+                        <option value="mujer">Mujer</option>
+                    </select>
+                </div>
+                 <button id="add-player-btn" class="mt-2 w-full text-white font-bold py-2 px-4 rounded-lg btn-primary">Añadir Jugador</button>
+                <div id="players-list" class="mt-4 flex flex-wrap gap-2">
+                    <!-- Las etiquetas de los jugadores aparecerán aquí -->
+                </div>
+            </div>
+
+            <!-- Categoría y Nivel -->
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Categoría</label>
+                    <select id="category-select" class="w-full rounded-lg px-4 py-2 text-white input-field">
+                        <option value="normal">Normal</option>
+                        <option value="parejas">Parejas</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="level-select" class="block text-sm font-medium text-gray-300 mb-2">Nivel</label>
+                    <select id="level-select" class="w-full rounded-lg px-4 py-2 text-white input-field">
+                        <option value="1">1: Suave</option>
+                        <option value="2">2: Intermedio</option>
+                        <option value="3">3: Picante 🔥</option>
+                        <option value="4">4: Extremo 🌶️</option>
+                        <option value="5">5: GOD 😈</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Botón de Iniciar Juego -->
+            <button id="start-game-btn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg text-lg disabled:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-300">
+                Empezar Juego
+            </button>
+        </div>
+
+        <!-- Pantalla de Juego -->
+        <div id="game-screen" class="hidden glass-card p-6 md:p-8 rounded-2xl text-center space-y-8">
+            <h2 class="font-title text-3xl font-bold tracking-wider">Turno de:</h2>
+            <p id="current-player-name" class="font-title text-6xl font-extrabold text-pink-400 player-name-pulse"></p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button id="truth-btn" class="btn-secondary text-white font-bold py-4 rounded-lg text-2xl font-title tracking-wider">Verdad</button>
+                <button id="dare-btn" class="btn-tertiary text-white font-bold py-4 rounded-lg text-2xl font-title tracking-wider">Reto</button>
+            </div>
+            <button id="end-game-btn" class="w-full mt-4 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 rounded-lg transition-colors">Terminar Juego</button>
+        </div>
+
+    </div>
+
+    <!-- Modal para mostrar Verdad o Reto -->
+    <div id="modal-container" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background-color: rgba(0,0,0,0.7);">
+        <div id="modal-content" class="glass-card rounded-2xl w-full max-w-lg p-8 text-center space-y-6">
+            <h3 id="modal-title" class="font-title text-4xl font-bold text-pink-400 neon-text-alt tracking-wider"></h3>
+            <p id="modal-text" class="text-xl text-gray-200 min-h-[80px]"></p>
+            <button id="next-turn-btn" class="w-full text-white font-bold py-3 rounded-lg text-lg btn-primary">Siguiente Turno</button>
+        </div>
+    </div>
+
+    <script>
+        // --- DOM Elements ---
+        const setupScreen = document.getElementById('setup-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const playerInput = document.getElementById('player-input');
+        const genderSelect = document.getElementById('gender-select');
+        const addPlayerBtn = document.getElementById('add-player-btn');
+        const playersList = document.getElementById('players-list');
+        const categorySelect = document.getElementById('category-select');
+        const levelSelect = document.getElementById('level-select');
+        const startGameBtn = document.getElementById('start-game-btn');
+        const endGameBtn = document.getElementById('end-game-btn');
+        const currentPlayerName = document.getElementById('current-player-name');
+        const truthBtn = document.getElementById('truth-btn');
+        const dareBtn = document.getElementById('dare-btn');
+        const modalContainer = document.getElementById('modal-container');
+        const modalContent = document.getElementById('modal-content');
+        const modalTitle = document.getElementById('modal-title');
+        const modalText = document.getElementById('modal-text');
+        const nextTurnBtn = document.getElementById('next-turn-btn');
+
+        // --- Game State ---
+        let players = [];
+        let currentPlayerIndex = 0;
+        let gameSettings = { category: 'normal', level: '1' };
+
+        // --- Database ---
+        const questions = {
+            normal: {
+                '1': { truths: ["¿Cuál es la película que más te ha hecho llorar?", "¿Si pudieras tener un superpoder, cuál sería?", "¿Cuál es tu gusto culposo en música?"], dares: ["Habla con un acento diferente durante los próximos 3 turnos.", "Haz tu mejor imitación de un bebé llorando.", "Dale un cumplido sincero a [COMPAÑERO_ALEATORIO]."] },
+                '2': { truths: ["¿Qué es lo más vergonzoso que te ha pasado en una cita?", "¿Cuál es la mentira más grande que has dicho sin que te atrapen?", "¿Qué es lo más extraño que has buscado en Google?"], dares: ["Llama a una pizzería y pregunta si venden tacos.", "Deja que [COMPAÑERO_ALEATORIO] te dibuje algo en la cara con un marcador (no permanente).", "Haz un baile sensual durante 30 segundos."] },
+                '3': { truths: ["¿Quién de los presentes es el que peor te cae y por qué?", "¿Cuál es la fantasía más extraña que has tenido?", "Describe el momento más caliente que has vivido."], dares: ["Quítate una prenda de ropa (la que elijas).", "Dale un beso en la mejilla a [COMPAÑERO_OPUESTO].", "Describe con detalles cómo sería tu cita perfecta con [COMPAÑERO_ALEATORIO]."] },
+                '4': { truths: ["¿Cuál es la parte de tu cuerpo que menos te gusta y por qué?", "¿Qué es lo más atrevido que harías por un millón de dólares?", "¿Cuál es tu mayor secreto 'inconfesable'?"], dares: ["Hazle un baile erótico a [COMPAÑERO_OPUESTO].", "Intercambia una prenda de ropa con [COMPAÑERO_ALEATORIO].", "Permite que [COMPAÑERO_ALEATORIO] revise tus mensajes directos de Instagram por 1 minuto."] },
+                '5': { 
+                    truths: [
+                        // Contenido Original
+                        "Describe la fantasía sexual más perversa que has tenido.",
+                        "¿Cuál es el video pornográfico más raro que has visto?",
+                        "¿Con cuántas personas de las que están jugando te acostarías?",
+                        "¿Qué es lo más atrevido que has hecho en público relacionado con el sexo?",
+                        "¿Alguna vez has pagado por sexo o contenido explícito?",
+                        "¿Cuál es el fetiche más raro que te excita?",
+                        "Describe el olor corporal que más te excita en otra persona.",
+                        "¿Qué es lo más cercano a un acto ilegal que has hecho por excitación sexual?",
+                        "De los presentes, ¿a quién te gustaría ver teniendo sexo con otra persona del grupo?",
+                        "¿Cuál es el objeto más extraño que has usado para masturbarte?",
+                        "Describe con detalle la última vez que te masturbaste: dónde, cómo y pensando en qué o quién.",
+                        "¿Qué es algo sexualmente que te da vergüenza admitir que te gusta?",
+                        "Si tuvieras que tener sexo con un animal, ¿cuál sería y por qué? (Hipotéticamente)",
+                        "De los presentes, ¿quién crees que es el/la mejor en la cama? Justifica tu respuesta.",
+                        // Nuevas Preguntas
+                        "¿Cuál es la mentira más grande que le has dicho a una pareja sobre tu pasado sexual?",
+                        "¿Alguna vez has tenido una experiencia sexual con más de una persona a la vez? Descríbela.",
+                        "¿Qué es lo más doloroso que has experimentado en el sexo que aun así te gustó?",
+                        "Si pudieras ser invisible por un día, ¿a quién del grupo espiarías en su intimidad?",
+                        "Nombra una categoría de porno que ves en secreto y que nunca admitirías.",
+                        "¿Has grabado o te han grabado alguna vez durante el sexo? ¿Qué pasó con ese video/foto?",
+                        "¿Cuál es tu récord de orgasmos en un solo día?",
+                        "Describe el sabor de los genitales de la última persona con la que tuviste sexo oral.",
+                        "¿Qué es lo más humillante que has hecho o te han hecho en la cama que te haya excitado?",
+                        "Si tuvieras que elegir a dos personas de este grupo para hacer un trío, ¿quiénes serían?",
+                        "¿Alguna vez has olido la ropa interior usada de alguien por excitación?",
+                        "¿Cuál es el lugar más arriesgado donde has tenido relaciones sexuales?",
+                        "¿Qué es lo que más te excita de la idea de ser dominado/a o dominar a alguien?",
+                        "¿Has fingido un orgasmo? ¿Con quién y por qué?",
+                        "¿Qué sonido que hace otra persona durante el sexo te vuelve loco/a?"
+                    ], 
+                    dares: [
+                        // Contenido Original
+                        "Quítate toda la ropa hasta quedar completamente desnudo/a durante 2 turnos.",
+                        "Haz una demostración de tu mejor gemido de orgasmo, tan fuerte como puedas.",
+                        "Bésate apasionadamente con [COMPAÑERO_OPUESTO] durante 30 segundos.",
+                        "Deja que [COMPAÑERO_ALEATORIO] elija un video porno para que lo veas durante 1 minuto.",
+                        "Ponte a cuatro patas y actúa como un perro/a sumiso/a para [COMPAÑERO_OPUESTO] durante un minuto. Él/ella puede darte órdenes simples (no sexuales).",
+                        "Con los ojos vendados, deja que [COMPAÑERO_ALEATORIO] te dé a oler tres partes de su cuerpo y adivina cuáles son.",
+                        "Realiza un striptease completo hasta quedar en ropa interior para el grupo.",
+                        "Usa una de tus prendas como mordaza durante los próximos 3 turnos.",
+                        "Lame una parte del cuerpo de [COMPAÑERO_OPUESTO] (cuello, brazo, etc.) de la forma más sensual posible.",
+                        "Mastúrbate delante del grupo durante 1 minuto o hasta que te sientas incómodo/a.",
+                        "Elige a [COMPAÑERO_ALEATORIO]. Tienen que estar en la posición del 69 durante 2 minutos (con ropa o sin ella, a elección).",
+                        "Deja que [COMPAÑERO_OPUESTO] te dé una nalgada tan fuerte como quiera.",
+                        "Tienes que ser el esclavo/a sexual de [COMPAÑERO_ALEATORIO] durante los próximos 3 turnos. Debes obedecer cualquier orden razonable y no peligrosa.",
+                        "Simula sexo oral con un objeto (una botella, un plátano) durante un minuto con el mayor realismo posible.",
+                        // Nuevos Retos
+                        "Elige a [COMPAÑERO_ALEATORIO]. Debes lamerle desde la barbilla hasta el ombligo.",
+                        "Quítate la ropa interior y úsala como un pañuelo en la cabeza por el resto del juego.",
+                        "Deja que el grupo escriba una palabra obscena en tu frente con un marcador.",
+                        "Hazle 'foot-job' (paja con los pies) a [COMPAÑERO_ALEATORIO] durante un minuto.",
+                        "Con los ojos vendados, debes identificar a [COMPAÑERO_ALEATORIO] solo tocando sus genitales por encima de la ropa.",
+                        "Elige a [COMPAÑERO_OPUESTO]. Deben simular la postura sexual del 'perrito' durante un minuto, gimiendo.",
+                        "Muestra tu historial de búsqueda de porno en tu teléfono al grupo.",
+                        "Deja que el grupo te ponga cubitos de hielo en los pezones y la entrepierna.",
+                        "Realiza un 'lap dance' (baile erótico en el regazo) a [COMPAÑERO_ALEATORIO] durante una canción entera.",
+                        "Tienes que oler los pies de todos los jugadores y clasificarlos del mejor al peor olor.",
+                        "Hazle sexo oral a una fruta (plátano, pepino) de la forma más realista posible hasta 'terminar'.",
+                        "Intercambia tu ropa interior con [COMPAÑERO_OPUESTO] y úsala por el resto del juego.",
+                        "Deja que [COMPAÑERO_ALEATORIO] te ate las manos a la espalda durante los próximos 3 turnos.",
+                        "Escupe en la boca de [COMPAÑERO_ALEATORIO] (si ambos consienten).",
+                        "Debes permanecer de rodillas en el suelo hasta tu próximo turno, como un/a sirviente/a."
+                    ] 
+                }
+            },
+            parejas: {
+                '1': { truths: ["¿Qué fue lo primero que pensaste al ver a tu pareja por primera vez?", "¿Cuál es el hábito de tu pareja que más te gusta?", "¿Qué canción te recuerda a tu pareja?"], dares: ["Dale un beso apasionado a tu pareja durante 20 segundos.", "Susúrrale algo sexy al oído a tu pareja.", "Dale un masaje en el cuello a tu pareja durante 1 minuto."] },
+                '2': { truths: ["¿Cuál es el hábito más molesto de tu pareja?", "¿Alguna vez has sentido celos de alguno de sus amigos/as?", "¿Qué es algo que te gustaría probar en la intimidad con tu pareja?"], dares: ["Quítale una prenda de ropa a tu pareja.", "Baila una canción lenta y romántica con tu pareja.", "Recrea vuestro primer beso."] },
+                '3': { truths: ["¿Cuál es tu fantasía sexual número uno con tu pareja?", "¿Has fingido alguna vez en la intimidad? ¿Por qué?", "¿Qué es lo que más te excita de tu pareja?"], dares: ["Dale un beso a tu pareja en su parte favorita del cuerpo (que no sea la boca).", "Hazle un striptease de 30 segundos a tu pareja.", "Tu pareja elige una parte de tu cuerpo para besar durante un minuto."] },
+                '4': { truths: ["¿Cuál es la posición sexual que menos te gusta y por qué?", "¿Has pensado en alguien más mientras estabas con tu pareja?", "¿Qué es lo más vergonzoso que te ha pedido tu pareja en la cama?"], dares: ["Quédense en ropa interior por el resto del juego.", "Jueguen 7 minutos en el paraíso (o en otra habitación).", "El próximo reto que le toque a tu pareja, lo tienen que hacer juntos."] },
+                '5': { 
+                    truths: [
+                        // Contenido Original
+                        "¿Qué es algo que siempre has querido que tu pareja te haga en la cama pero nunca te has atrevido a pedir?",
+                        "Describe en detalle cómo fue la mejor vez que tuvieron sexo.",
+                        "Si pudieras tener un trío, ¿a quién invitarías y por qué?",
+                        "¿Cuál es tu 'palabra segura' o cuál te gustaría que fuera?",
+                        "¿Qué rol (dominante/sumiso) prefieres en la cama y por qué?",
+                        "Describe una fantasía donde tu pareja no es el/la protagonista.",
+                        "¿Qué opinas del 'cuckolding' o de ver a tu pareja con alguien más?",
+                        "¿Qué es lo más degradante (en un buen sentido) que te gustaría que tu pareja te hiciera?",
+                        "Si pudieras grabar un video sexual con tu pareja, ¿cuál sería el guion?",
+                        "¿Cuál es la parte del cuerpo de tu pareja que más te gusta saborear?",
+                        // Nuevas Preguntas
+                        "¿Qué es lo que tu pareja hace en la cama que secretamente no te gusta tanto?",
+                        "Si tuvieras que describir el sabor de tu pareja usando solo tres palabras, ¿cuáles serían?",
+                        "¿Cuál es la fantasía sexual que tienes que crees que más impactaría o sorprendería a tu pareja?",
+                        "¿Con qué amigo/a tuyo/a crees que tu pareja tendría una aventura si tuviera la oportunidad?",
+                        "¿Qué es lo más que has llegado a pagar por un juguete sexual para usar juntos?",
+                        "¿Han tenido sexo en un lugar donde corrían un riesgo real de ser atrapados? Descríbelo.",
+                        "¿Qué parte de la rutina diaria de tu pareja te excita de una manera no obvia?",
+                        "¿Qué opinarías si tu pareja quisiera explorar el BDSM de forma seria?",
+                        "¿Cuál es el apodo más vergonzoso que le has puesto a los genitales de tu pareja (o a los tuyos)?",
+                        "Si pudieras cambiar una sola cosa de su vida sexual, ¿qué sería y por qué?",
+                        "¿Alguna vez has espiado a tu pareja mientras se masturba?",
+                        "¿Cuál es el límite que nunca cruzarías en el sexo, ni siquiera por tu pareja?",
+                        "Describe con detalle el orgasmo más intenso que tu pareja te ha dado.",
+                        "¿Qué piensas sobre las relaciones abiertas?",
+                        "¿Qué es lo que más te excita de tu pareja que no sea físico?"
+                    ], 
+                    dares: [
+                        // Contenido Original
+                        "Quítense la ropa mutuamente y jueguen el resto de la partida desnudos.",
+                        "Tengan sexo oral el uno al otro durante 2 minutos (o vayan a otra habitación y háganlo).",
+                        "Tu pareja debe atarte y puede hacer lo que quiera contigo durante 5 minutos (con consentimiento y límites previos).",
+                        "Graben un video corto (15 segundos) de ustedes haciendo algo provocador y bórrenlo después.",
+                        "Uno de ustedes se venda los ojos y el otro usa su cuerpo para darle placer usando solo una parte del cuerpo (ej: solo las manos, solo la boca).",
+                        "Practiquen 'teasing and denial': uno de ustedes debe excitar al otro tanto como sea posible durante 3 minutos, pero sin permitirle llegar al orgasmo.",
+                        "Túrnense para susurrarle al otro la cosa más sucia que se les ocurra al oído.",
+                        "Tener sexo en la posición que elija el otro, sin importar si es tu favorita o no.",
+                        "Tu pareja te vendará los ojos y usará comida (chocolate, nata, miel) en tu cuerpo para luego lamerla.",
+                        "Realicen la penetración (o simúlenla) en una posición elegida por el grupo durante al menos un minuto.",
+                        // Nuevos Retos
+                        "Tu pareja debe darte 10 nalgadas, aumentando la intensidad con cada una.",
+                        "Deben besarse continuamente mientras uno de los dos intenta quitarle toda la ropa al otro.",
+                        "Uno se sienta en una silla, el otro debe hacerle un 'lap dance' hasta que se excite visiblemente.",
+                        "Usando solo la boca, deben pasarse un cubito de hielo de uno a otro hasta que se derrita.",
+                        "Tu pareja te susurrará al oído cómo quiere que le hagas sexo oral, con todo detalle, mientras tú no puedes tocarle.",
+                        "Deben masturbarse uno frente al otro hasta llegar al orgasmo.",
+                        "Uno de ustedes debe actuar como un completo sumiso/a para el otro durante 10 minutos, obedeciendo órdenes como 'tráeme agua', 'masajea mis pies', etc.",
+                        "Hagan una llamada telefónica a un amigo/a y finjan tener un orgasmo mientras hablan de algo normal.",
+                        "Deben lamerse mutuamente una parte del cuerpo elegida por el otro al mismo tiempo.",
+                        "Tu pareja te vendará los ojos y te dará a probar 3 cosas de la cocina. Debes adivinar qué son solo con el gusto.",
+                        "Uno debe escribir con la lengua una palabra 'sucia' en la espalda del otro, y este debe adivinarla.",
+                        "Deben recrear su primera vez juntos, pero de la forma más torpe y exagerada posible.",
+                        "Tienen que darse de comer el uno al otro de forma muy sensual, usando las manos.",
+                        "Tu pareja tiene que 'adorar' tus pies, besándolos y masajeándolos durante 2 minutos.",
+                        "Deben tener una 'pelea' de besos, donde el objetivo es ser el que besa de forma más dominante y apasionada."
+                    ] 
+                }
+            }
+        };
+
+        // --- Functions ---
+        
+        function updatePlayersUI() {
+            playersList.innerHTML = '';
+            players.forEach((player, index) => {
+                const playerTag = document.createElement('span');
+                const genderIcon = player.gender === 'hombre' 
+                    ? `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gender-male" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M9.5 2a.5.5 0 0 1 0-1h5a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0V2.707L9.871 6.836a5 5 0 1 1-.707-.707L13.293 2H9.5zM6 6a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/></svg>`
+                    : `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gender-female" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 1a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM3 5a5 5 0 1 1 5.5 4.975V12h2a.5.5 0 0 1 0 1h-2v2.5a.5.5 0 0 1-1 0V13h-2a.5.5 0 0 1 0-1h2V9.975A5 5 0 0 1 3 5z"/></svg>`;
+                playerTag.className = 'flex items-center gap-2 bg-black bg-opacity-20 text-white text-sm font-medium px-3 py-1 rounded-full';
+                playerTag.innerHTML = `<span>${player.name}</span> <span class="text-pink-400">${genderIcon}</span>`;
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.textContent = '×';
+                removeBtn.className = 'text-gray-400 hover:text-white font-bold text-lg leading-none -mr-1';
+                removeBtn.onclick = () => removePlayer(index);
+                
+                playerTag.appendChild(removeBtn);
+                playersList.appendChild(playerTag);
+            });
+            checkCanStart();
+        }
+
+        function addPlayer() {
+            const playerName = playerInput.value.trim();
+            const gender = genderSelect.value;
+            if (playerName && !players.some(p => p.name === playerName)) {
+                players.push({ name: playerName, gender: gender });
+                playerInput.value = '';
+                updatePlayersUI();
+            }
+            playerInput.focus();
+        }
+
+        function removePlayer(index) {
+            players.splice(index, 1);
+            updatePlayersUI();
+        }
+        
+        function checkCanStart() {
+            if (categorySelect.value === 'parejas') {
+                 startGameBtn.disabled = players.length !== 2;
+            } else {
+                 startGameBtn.disabled = players.length < 2;
+            }
+        }
+        
+        categorySelect.addEventListener('change', checkCanStart);
+
+        function startGame() {
+            if (startGameBtn.disabled) return;
+            
+            gameSettings.category = categorySelect.value;
+            gameSettings.level = levelSelect.value;
+            currentPlayerIndex = Math.floor(Math.random() * players.length);
+
+            setupScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            
+            updateGameUI();
+        }
+
+        function endGame() {
+            gameScreen.classList.add('hidden');
+            setupScreen.classList.remove('hidden');
+        }
+
+        function updateGameUI() {
+            currentPlayerName.textContent = players[currentPlayerIndex].name;
+        }
+        
+        function getPartner(type) {
+            const currentPlayer = players[currentPlayerIndex];
+            const otherPlayers = players.filter((_, index) => index !== currentPlayerIndex);
+
+            if (otherPlayers.length === 0) return null;
+
+            if (type === 'opposite') {
+                const oppositeGender = currentPlayer.gender === 'hombre' ? 'mujer' : 'hombre';
+                const potentialPartners = otherPlayers.filter(p => p.gender === oppositeGender);
+                
+                if (potentialPartners.length > 0) {
+                    return potentialPartners[Math.floor(Math.random() * potentialPartners.length)];
+                }
+            }
+            
+            return otherPlayers[Math.floor(Math.random() * otherPlayers.length)];
+        }
+
+        function showQuestion(type) {
+            const { category, level } = gameSettings;
+            const options = questions[category][level][type === 'truth' ? 'truths' : 'dares'];
+            let text = options[Math.floor(Math.random() * options.length)];
+
+            if (text.includes('[COMPAÑERO_OPUESTO]')) {
+                const partner = getPartner('opposite');
+                text = partner ? text.replace(/\[COMPAÑERO_OPUESTO\]/g, partner.name) : text.replace(/\[COMPAÑERO_OPUESTO\]/g, 'alguien');
+            }
+            if (text.includes('[COMPAÑERO_ALEATORIO]')) {
+                const partner = getPartner('random');
+                text = partner ? text.replace(/\[COMPAÑERO_ALEATORIO\]/g, partner.name) : text.replace(/\[COMPAÑERO_ALEATORIO\]/g, 'alguien');
+            }
+
+            modalTitle.textContent = type === 'truth' ? 'Verdad' : 'Reto';
+            modalText.textContent = text;
+            showModal();
+        }
+        
+        function showModal() {
+            modalContainer.classList.remove('hidden');
+            modalContent.classList.remove('modal-exit');
+            modalContent.classList.add('modal-enter');
+        }
+
+        function hideModal() {
+            modalContent.classList.remove('modal-enter');
+            modalContent.classList.add('modal-exit');
+            setTimeout(() => {
+                modalContainer.classList.add('hidden');
+            }, 400); // Duración de la animación de salida
+        }
+
+        function nextTurn() {
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+            hideModal();
+            updateGameUI();
+        }
+
+        // --- Event Listeners ---
+        addPlayerBtn.addEventListener('click', addPlayer);
+        playerInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                addPlayer();
+            }
+        });
+        
+        startGameBtn.addEventListener('click', startGame);
+        endGameBtn.addEventListener('click', endGame);
+        
+        truthBtn.addEventListener('click', () => showQuestion('truth'));
+        dareBtn.addEventListener('click', () => showQuestion('dare'));
+        
+        nextTurnBtn.addEventListener('click', nextTurn);
+        modalContainer.addEventListener('click', (e) => {
+            if (e.target === modalContainer) {
+               nextTurn();
+            }
+        });
+
+        // --- Initial call ---
+        checkCanStart();
+
+    </script>
+</body>
+</html>
